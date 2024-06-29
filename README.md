@@ -1,2 +1,2 @@
 # MD-Water
-This is a code for the Molecular Dynamic Simulation of Water. Here the SPC/E Model is used. We are attempting to find the number density and diffusion coeficient of 2992 water molecules. 
+     This project aims to simulate the Molecular Dynamic Simulation of Water with the assistance of the SPC/E(Simple Point Charge/Extended) Water Model. The primary objective is to find the number density and diffusion coeficient of 2992 water molecules. To equilibrate the system we use a thermostat(NVT) and a barostat(NPT), and further while finding the diffusion coefficient we make use of the 
