@@ -1,0 +1,54 @@
+echo			screen
+units			real
+boundary		p p p
+atom_style		full
+pair_style		lj/cut/coul/long 12.0 
+pair_modify		shift yes
+read_restart		equil0.res
+
+log			diffusion1.log
+
+bond_style		harmonic
+angle_style		harmonic
+
+bond_coeff		1 1000.0 1.00
+angle_coeff		1 1000.0 109.47
+
+pair_coeff		* *  0.0 0.0
+pair_coeff		1 1  0.155300 3.1660 	######### SPC/E water model
+
+group			water type 1 2
+group			fluid type 1 2 
+group			oxy type 1
+
+kspace_style		pppm 0.00001
+
+reset_timestep		0
+
+compute			Twat water temp/com
+
+fix			fWshk fluid shake 0.0001 20 0 b 1 a 1
+
+fix			fNve water nve temp 300.0 300.0 100.0 
+
+thermo_style		custom step temp press density pe ke etotal c_Twat 
+thermo			5000
+thermo_modify		flush yes
+run		        10000                       ##0.01 ns
+reset_timestep		0
+
+# msd
+compute 		ms all msd com yes
+fix			4 all vector 10 c_ms[4]
+variable        	diff equal c_ms[4]/6.0/(step*dt+1.0e-6) ############ diffusion coefficient
+compute			cWat oxy chunk/atom bin/1d z center 0.1 units box 
+
+dump			dmp all dcd 10000 diff1.dcd
+thermo			10000
+
+fix			fPres all ave/time 20 5000 100000  v_diff file diff1.txt
+run			1000000				#################### 1ns
+undump			dmp
+
+unfix			fPres
+unfix                   fNve
